@@ -71,7 +71,7 @@ def create_tables():
 
 
 def get_user_by_id(user_id: int) -> dict | None:
-    """user_id로 유저 단건 조회"""
+    """user_id로 유저 조회"""
     sql = "SELECT * FROM USERS WHERE user_id = :user_id"
     with get_connection() as conn:
         cursor = conn.cursor()
@@ -103,8 +103,8 @@ def get_user_by_provider(provider: str, provider_id: str) -> dict | None:
 def insert_user(nickname: str, email: str | None, profile_image: str | None) -> int:
     """유저 생성 후 user_id 반환"""
     sql = """
-        INSERT INTO USERS (nickname, email, profile_image)
-        VALUES (:nickname, :email, :profile_image)
+        INSERT INTO USERS (nickname, email)
+        VALUES (:nickname, :email)
         RETURNING user_id INTO :user_id
     """
     with get_connection() as conn:
@@ -113,7 +113,7 @@ def insert_user(nickname: str, email: str | None, profile_image: str | None) -> 
         cursor.execute(sql, {
             "nickname": nickname,
             "email": email,
-            "profile_image": profile_image,
+            # "profile_image": profile_image, -- 일단 제외, 추가하면 위에 sql 문도 수정해야 함.
             "user_id": user_id_var,
         })
         return user_id_var.getvalue()[0]
