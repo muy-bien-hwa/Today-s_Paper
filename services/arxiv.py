@@ -106,13 +106,15 @@ TODO : all, ti(제목만), abs(초록만), au(저자만), co(논문 ID만), jr(�
 """
 
 
-async def search_papers_by_category(keyword: str, category: str, page: int = 1, size: int = 10) -> list[dict]:
+async def search_papers_by_category(keyword: str, categories: list[str], page: int = 1, size: int = 10) -> list[dict]:
     """키워드 + 카테고리로 arXiv 논문 검색"""
     start = (page - 1) * size
+    cat_query = " OR ".join(f"cat:{c}" for c in categories)
+    search_query = f"all:{keyword} AND ({cat_query})" if keyword else cat_query
 
     async with httpx.AsyncClient() as client:
         response = await client.get(ARXIV_API_URL, params={
-            "search_query": f"all:{keyword} AND cat:{category}",
+            "search_query": search_query,
             "start":        start,
             "max_results":  size,
             "sortBy":       "relevance",
@@ -123,7 +125,7 @@ async def search_papers_by_category(keyword: str, category: str, page: int = 1, 
 
 
 """
-TODO : 나중에는 여러 카테고리 검색도 지원하도록 수정
+TODO : 나중에는 여러 카테고리 검색도 지원하도록 수정 (수정 완)
 """
 
 
